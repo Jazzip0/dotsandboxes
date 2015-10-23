@@ -1,0 +1,208 @@
+<html lang="en" ng-app="myApp">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/0.9.4/angular-material.min.css">
+  <link rel="stylesheet" href="font/font-awesome/css/font-awesome.min.css">
+  <meta name="viewport" content="initial-scale=1" />
+  <style type="text/css">
+    .room{
+      width:50px;
+      height:50px;
+    }
+    .non-side{
+
+    }
+  .hor{
+      margin: 4px 0px 4px 0px;
+    }
+    .horLeft{
+      margin-bottom: 4px;
+    }
+    .vert{
+      margin-left:4px;
+    }
+    .side{
+    position: relative;
+    border-radius: 2px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .6);
+    background-color: #2ecc71;
+    color: #ecf0f1;
+    }
+    #progress{
+      height:10%; 
+      margin:8px;
+      padding:8px;
+
+    }
+    :focus {
+    outline: none;
+    border: 0;
+    }
+    a{
+      text-decoration: none;
+    }
+
+    #square{
+      padding: 8px;
+      margin-left: auto;
+      margin-right: auto;
+      width:60%;
+      height:60vw; 
+    }
+    .aniBackground{
+      -webkit-transition: background-color .2s ease-in;
+    -moz-transition: background-color .2s ease-in;
+    -ms-transition: background-color .2s ease-in;
+    -o-transition: background-color .2s ease-in;
+    transition: background-color .2s ease-in;
+    }
+
+    @media (max-width:600px){
+      .hidemobile{
+        display: none;
+      }
+      #square{
+        width:96%;
+        height:96%; 
+      }
+      .aniBackground{
+      -webkit-transition: none;
+    -moz-transition: none;
+    -ms-transition: none;
+    -o-transition: none;
+    transition: none;
+    }
+    md-grid-tile{
+      font-size: 10px;
+    }
+    .side{
+      box-shadow: 0 1px 0px rgba(0, 0, 0, .6);
+    }
+    .hor{
+      margin: 1px 0px 1px 0px;
+    }
+    .horLeft{
+      margin-bottom: 1px;
+    }
+    .vert{
+      margin-left:1px;
+    }
+    }
+    @media (min-width:1200px){
+      #square{
+        width:800px;
+        height:800px; 
+      }
+    }
+    md-divider{
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+    md-grid-tile i{
+      color:#FFF;
+    }
+    #pair{
+      position: fixed;
+      bottom: 40px;
+  right: 40px;
+   -webkit-transition: opacity .2s ease-in;
+    -moz-transition: opacity .2s ease-in;
+    -ms-transition: opacity .2s ease-in;
+    -o-transition: opacity .2s ease-in;
+    transition: opacity .2s ease-in;
+    }
+    md-bottom-sheet{
+      position:fixed;
+      bottom:0;
+    }
+  </style>
+</head>
+<body  ng-controller="appController" class="aniBackground">
+  <md-toolbar>
+  <div class="md-toolbar-tools">
+    <span>Dots and Boxes</span>
+    <!-- fill up the space between left and right area -->
+    <span flex></span>
+    <md-button>
+    Joep Schyns
+  </md-button>
+</div>
+</md-toolbar>
+<div layout="column" id="content" class="aniBackground">
+<div layout="row" layout-sm="column">
+  <md-card id="input">
+  <md-card-content flex="fill">
+  <md-input-container>
+  <label>Size of sides</label>
+  <input ng-model="board.sides" ng-change="updateField()" type="integer">
+</md-input-container>
+<md-input-container>
+<label>Amount of players</label>
+<input ng-model="board.players" ng-change="updateField()" type="integer">
+</md-input-container>
+<md-grid-list
+md-cols="2" md-cols-sm="7" md-row-height="1:1"
+md-gutter="6px">
+<md-grid-tile id="player{{n.id}}" style="background-color:{{getPlayerColor(n.id)}};"ng-repeat="n in players">
+<i class="fa fa-user"></i>
+<md-grid-tile-footer class="hidemobile">
+<h3>Player {{n.id}} <br> wins: {{n.rooms}}</h3 ng-model="n.rooms">
+</md-grid-tile-footer>
+</md-grid-tile>
+
+</md-grid-list>
+</md-card-content>
+ <md-divider ></md-divider>
+<div id="progress" layout-align="center start" layout="column">
+<div ><b>Progress:</b></div><div ng-model="espectedTime">{{espectedTime}}</div>
+<div layout-align="center center" layout="row" style="width:100%">
+<md-progress-linear flex="80"  md-mode="determinate" value="{{progress}}"></md-progress-linear>
+<div flex="20"><div layout="row" layout-align="center center">{{progress | number:0}}%</div></div>
+</div>
+</div>
+</md-card>
+<md-card id="square">
+<div layout="row" flex="100">
+<div layout="column" style="width:{{(100 / board.sides) * .2| number:0}}%; height:100%">
+    <div  flex="{{(100 / board.sides)}}"  ng-repeat="m in range(1,board.sides)"  class="side horLeft aniBackground" resize md-ink-ripple ng-click="clickSide()" id="0{{m - 1}}left">
+    </div>
+  </div>
+  <div layout="column" flex="{{100 - (100 / board.sides) * .2 | number:0}}">
+    <div flex="{{100 - (100 / board.sides) * .2 | number:0}}"  layout="column">
+      <div layout="row" ng-repeat="n in range(1,board.sides)" flex="{{100 / board.sides}}" >
+      <div layout="column" flex="{{100 / board.sides}}"  ng-repeat="m in range(1,board.sides)" resize style="height:{{((100 - (20 / board.sides)) / board.sides) | number:0}}%;" class="middle">
+          <div flex="20" class="side vert aniBackground" ng-click="clickSide()" id="{{m - 1}}{{n - 1}}top" md-ink-ripple ></div>
+          <div flex="80" layout="row" >
+            <div flex="80" class="aniBackground" id="middle{{m - 1}}{{n - 1}}">
+            </div>
+            <div flex="20" class="side hor aniBackground" md-ink-ripple ng-click="clickSide()" id="{{m - 1}}{{n - 1}}right"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div layout="row" flex="{{(100 / board.sides) * .2 | number:0}}" style="height:100%">
+    <div flex="{{100 / board.sides}}"  ng-repeat="m in range(1,board.sides)"  class="side vert aniBackground" resize md-ink-ripple ng-click="clickSide()" id="{{m - 1}}{{board.sides - 1}}bottom">
+    </div>
+  </div>
+</div>
+</div>
+</md-card>
+</div>
+<md-button id="pair" class="md-fab" ng-click="showGridBottomSheet($event)">
+          <md-icon md-svg-src="img/screenshare.svg" class="screenshare"></md-icon>
+        </md-button>
+</div>
+
+
+
+<!-- Angular Material Dependencies -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-aria.min.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/0.9.4/angular-material.min.js"></script>
+
+
+<script type="text/javascript" src="js/controller.js"></script>
+</body>
+</html>
